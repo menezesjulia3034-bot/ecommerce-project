@@ -1,0 +1,17 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var Category_1 = require("./models/Category");
+var Product_1 = require("./models/Product");
+var User_1 = require("./models/User");
+var Cart_1 = require("./cart/Cart");
+var electronics = new Category_1.CategoryModel(1, "Eletrônicos");
+var phone = new Product_1.ProductModel(1, "Smartphone", 2500, electronics);
+var notebook = new Product_1.ProductModel(2, "Notebook", 4500, electronics);
+var user = new User_1.User(1, "João", "joao@email.com", User_1.UserRole.CUSTOMER);
+var cart = new Cart_1.Cart();
+cart.addItem(phone, 1);
+cart.addItem(phone, 2);
+cart.addItem(notebook, 1);
+console.log("Usuário:", user.username);
+console.log("Total de itens:", cart.getTotalItems());
+console.log("Valor final:", cart.getFinalPrice());
