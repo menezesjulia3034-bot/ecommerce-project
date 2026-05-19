@@ -1,94 +1,162 @@
 import {
   Request,
-  Response
+  Response,
+  NextFunction
 } from 'express'
+
+import { CategoryService }
+from '../services/CategoryService'
+
+import {
+  categoryParamsSchema,
+  categoryQueryPaginationSchema,
+  createCategorySchema,
+  updateCategorySchema
+} from '../schemas/category.schema'
 
 export class CategoryController {
 
-  // GET /category
-  static getAll(
+  constructor(
+    private categoryService:
+      CategoryService
+  ) {}
+
+  getAll = (
     req: Request,
-    res: Response
-  ) {
+    res: Response,
+    next: NextFunction
+  ) => {
 
-    const { page, size } = req.query
+    try {
 
-    res.json({
+      const query =
+        categoryQueryPaginationSchema
+          .parse(req.query)
 
-      message: 'Lista de categorias',
+      const categories =
+        this.categoryService.getAll(
+          query.page,
+          query.size
+        )
 
-      pagination: {
-        page,
-        size
-      }
+      res.json(categories)
 
-    })
+    } catch (error) {
+
+      next(error)
+
+    }
 
   }
 
-  // GET /category/:id
-  static getById(
+  getById = (
     req: Request,
-    res: Response
-  ) {
+    res: Response,
+    next: NextFunction
+  ) => {
 
-    const { id } = req.params
+    try {
 
-    res.json({
+      const params =
+        categoryParamsSchema
+          .parse(req.params)
 
-      message: 'Categoria encontrada',
+      const category =
+        this.categoryService
+          .getById(params.id)
 
-      id
+      res.json(category)
 
-    })
+    } catch (error) {
+
+      next(error)
+
+    }
 
   }
 
-  // POST /category
-  static create(
+  create = (
     req: Request,
-    res: Response
-  ) {
+    res: Response,
+    next: NextFunction
+  ) => {
 
-    res
-      .status(201)
-      .json({
+    try {
 
-        message: 'Categoria criada',
+      const body =
+        createCategorySchema
+          .parse(req.body)
 
-        category: req.body
+      const category =
+        this.categoryService
+          .create(body.name)
 
-      })
+      res
+        .status(201)
+        .json(category)
+
+    } catch (error) {
+
+      next(error)
+
+    }
 
   }
 
-  // PUT /category/:id
-  static update(
+  update = (
     req: Request,
-    res: Response
-  ) {
+    res: Response,
+    next: NextFunction
+  ) => {
 
-    const { id } = req.params
+    try {
 
-    res.json({
+      const params =
+        categoryParamsSchema
+          .parse(req.params)
 
-      message: 'Categoria atualizada',
+      const body =
+        updateCategorySchema
+          .parse(req.body)
 
-      id,
+      const category =
+        this.categoryService.update(
+          params.id,
+          body.name
+        )
 
-      data: req.body
+      res.json(category)
 
-    })
+    } catch (error) {
+
+      next(error)
+
+    }
 
   }
 
-  // DELETE /category/:id
-  static delete(
+  delete = (
     req: Request,
-    res: Response
-  ) {
+    res: Response,
+    next: NextFunction
+  ) => {
 
-    res.sendStatus(204)
+    try {
+
+      const params =
+        categoryParamsSchema
+          .parse(req.params)
+
+      this.categoryService
+        .delete(params.id)
+
+      res.sendStatus(204)
+
+    } catch (error) {
+
+      next(error)
+
+    }
 
   }
 

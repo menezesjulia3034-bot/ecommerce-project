@@ -1,65 +1,97 @@
 import express from 'express'
 
-import { CategoryController } from '../controllers/category.controller'
+import { CategoryController }
+from '../controllers/category.controller'
+
+import {
+  categoryRepository
+}
+from '../repositories/CategoryRepository'
+
+import { CategoryService }
+from '../services/CategoryService'
 
 import {
   categoryQueryPaginationSchema,
   categoryParamsSchema,
-  createCategorySchema
+  createCategorySchema,
+  updateCategorySchema
 } from '../schemas/category.schema'
 
-import { validateData } from '../middlewares/validateData'
+import { validateData }
+from '../middlewares/validateData'
+
+import { authMiddleware }
+from '../middlewares/authMiddleware'
+
+import { authorize }
+from '../middlewares/authorize'
 
 const router = express.Router()
 
-// GET /category
+const service =
+  new CategoryService(
+    categoryRepository
+  )
+
+const controller =
+  new CategoryController(service)
+
+// PUBLIC
 router.get(
   '/',
   validateData(
     categoryQueryPaginationSchema,
     'query'
   ),
-  CategoryController.getAll
+  controller.getAll
 )
 
-// GET /category/:id
 router.get(
   '/:id',
   validateData(
     categoryParamsSchema,
     'params'
   ),
-  CategoryController.getById
+  controller.getById
 )
 
-// POST /category
+// PROTECTED
 router.post(
   '/',
+  authMiddleware,
+  authorize('admin'),
   validateData(
     createCategorySchema,
     'body'
   ),
-  CategoryController.create
+  controller.create
 )
 
-// PUT /category/:id
 router.put(
   '/:id',
+  authMiddleware,
+  authorize('admin'),
   validateData(
     categoryParamsSchema,
     'params'
   ),
-  CategoryController.update
+  validateData(
+    updateCategorySchema,
+    'body'
+  ),
+  controller.update
 )
 
-// DELETE /category/:id
 router.delete(
   '/:id',
+  authMiddleware,
+  authorize('admin'),
   validateData(
     categoryParamsSchema,
     'params'
   ),
-  CategoryController.delete
+  controller.delete
 )
 
 export default router

@@ -1,33 +1,45 @@
 import express from 'express'
 
-import productsRouter from './routes/products'
-import ordersRouter from './routes/orders'
+import categoryRoutes
+from './routes/category.router'
 
-import categoryRouter from './routes/category.router'
-import productRouter from './routes/product.router'
+import productRoutes
+from './routes/product.router'
 
-import logger from './middlewares/logger'
+import logger
+from './middlewares/logger'
+
+import { errorMiddleware }
+from './middlewares/errorMiddleware'
 
 const app = express()
 
 app.use(express.json())
 
+// LOGGER GLOBAL
 app.use(logger)
 
-// rotas antigas
-app.use('/products-old', productsRouter)
-app.use('/orders', ordersRouter)
+// ROUTES
+app.use(
+  '/category',
+  categoryRoutes
+)
 
-// rotas novas
-app.use('/category', categoryRouter)
-app.use('/products', productRouter)
+app.use(
+  '/products',
+  productRoutes
+)
+
+// ERROR MIDDLEWARE
+app.use(errorMiddleware)
 
 const PORT = 3000
 
 app.listen(PORT, () => {
 
   console.log(
-    `🚀 Servidor rodando em http://localhost:${PORT}`
+    `🚀 Servidor rodando em:
+http://localhost:${PORT}`
   )
 
 })
